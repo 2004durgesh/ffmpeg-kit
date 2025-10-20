@@ -1904,7 +1904,7 @@ class FFmpegKitInitializer {
       this.#initialized = true;
     }
 
-    console.log("Loading ffmpeg-kit-react-native.");
+    console.log("Loading react-native-ffmpeg-kit.");
 
     this.#eventEmitter.addListener(eventLogCallbackEvent, FFmpegKitInitializer.processLogCallbackEvent);
     this.#eventEmitter.addListener(eventStatisticsCallbackEvent, FFmpegKitInitializer.processStatisticsCallbackEvent);
@@ -1918,7 +1918,7 @@ class FFmpegKitInitializer {
     await FFmpegKitConfig.enableRedirection();
     const isLTSPostfix = (await FFmpegKitConfig.isLTSBuild()) ? "-lts" : "";
 
-    console.log(`Loaded ffmpeg-kit-react-native-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
+    console.log(`Loaded react-native-ffmpeg-kit-${platform}-${packageName}-${arch}-${version}${isLTSPostfix}.`);
   }
 
 }

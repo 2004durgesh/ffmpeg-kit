@@ -76,7 +76,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FFmpegKitReactNativeModule extends ReactContextBaseJavaModule {
 
-  public static final String LIBRARY_NAME = "ffmpeg-kit-react-native";
+  public static final String LIBRARY_NAME = "react-native-ffmpeg-kit";
   public static final String PLATFORM_NAME = "android";
 
   // LOG CLASS
