@@ -154,12 +154,96 @@ packages using the instructions below.
 
 - Edit `android/build.gradle` file and add the package name in `ext.ffmpegKitPackage` variable.
 
-    ```gradle
+```gradle
+   buildscript {
     ext {
-        ffmpegKitPackage = "<package name>"
+        .....
+        ffmpegKitPackage = "full-gpl"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        ....
+
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        flatDir {
+            dirs "$rootDir/libs"
+        }
+    }
+}
+
+apply plugin: "com.facebook.react.rootproject"
+
+```
+
+- Edit `android/app/build.gradle`
+
+```gradle
+   import java.net.URL // Add this line on top of the file
+
+android {
+    .......
+
+    // Add this code for accessing the file locally after downloading
+    repositories {
+        flatDir {
+            dirs "$rootDir/libs"
+        }
+    }
+}
+
+dependencies {
+
+    // Add the following dependencies
+    implementation(name: 'ffmpeg-kit-full-gpl', ext: 'aar')
+    implementation 'com.arthenica:smart-exception-java:0.2.1'
+
+    ........
+}
+
+// Add the following script to download the file from the cloud
+afterEvaluate {
+    def aarUrl = 'https://github.com/NooruddinLakhani/ffmpeg-kit-full-gpl/releases/download/v1.0.0/ffmpeg-kit-full-gpl.aar'
+    def aarFile = file("${rootDir}/libs/ffmpeg-kit-full-gpl.aar")
+
+    tasks.register("downloadAar") {
+        doLast {
+             if (!aarFile.parentFile.exists()) {
+                println "📁 Creating directory: ${aarFile.parentFile.absolutePath}"
+                aarFile.parentFile.mkdirs()
+            }
+            if (!aarFile.exists()) {
+                println "⏬ Downloading AAR from $aarUrl..."
+                new URL(aarUrl).withInputStream { i ->
+                    aarFile.withOutputStream { it << i }
+                }
+                println "✅ AAR downloaded to ${aarFile.absolutePath}"
+            } else {
+                println "ℹ️ AAR already exists at ${aarFile.absolutePath}"
+            }
+        }
     }
 
-    ```
+    // Make sure the AAR is downloaded before compilation begins
+    preBuild.dependsOn("downloadAar")
+}
+```
+
+- Modify package.json and add the following script to download the file from the cloud after executing yarn install or npn install
+```json
+  "scripts": {
+    ...
+    "postinstall": "cd android && ./gradlew :app:downloadAar"
+  },
+```
 
 ##### 2.2.2 Enabling a Package on iOS
 
