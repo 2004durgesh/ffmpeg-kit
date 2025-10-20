@@ -1,5 +1,9 @@
 # Changelog
 
+## <small>6.1.1 (2025-10-20)</small>
+
+* chore: update package name ([6034f23](https://github.com/2004durgesh/ffmpeg-kit/commit/6034f23))
+
 ## 6.1.0 (2025-10-20)
 
 * chore: Bump aniyomi-mpv-lib to 1.16.n ([4f9f934](https://github.com/2004durgesh/ffmpeg-kit/commit/4f9f934))
