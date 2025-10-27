@@ -86,4 +86,4 @@ RUN chmod +x android.sh
 
 # Default command - run the build script
 # You can override with specific options like: docker run ffmpeg-kit-builder ./android.sh --enable-gpl
-CMD ["bash", "-c", "./android.sh"]
+CMD ["bash", "-c", "./android.sh --enable-android-media-codec --enable-android-zlib --disable-arm-v7a-neon --disable-x86-64"]
