@@ -1,0 +1,11 @@
+# Don't copy these to the Docker image
+.git
+.gitignore
+.tmp
+build.log
+prebuilt
+output
+android
+*.bat
+*.log
+aniyomi-mpv-lib

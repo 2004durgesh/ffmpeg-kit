@@ -6,23 +6,23 @@ on:
       - development
       - main
     paths:
-      - '.github/workflows/android-build-scripts.yml'
-      - 'android/**'
-      - '!android/README.md'
-      - 'scripts/**'
-      - 'tools/**'
-      - 'android.sh'
+      - ".github/workflows/android-build-scripts.yml"
+      - "android/**"
+      - "!android/README.md"
+      - "scripts/**"
+      - "tools/**"
+      - "android.sh"
   pull_request:
     branches:
       - development
       - main
     paths:
-      - '.github/workflows/android-build-scripts.yml'
-      - 'android/**'
-      - '!android/README.md'
-      - 'scripts/**'
-      - 'tools/**'
-      - 'android.sh'
+      - ".github/workflows/android-build-scripts.yml"
+      - "android/**"
+      - "!android/README.md"
+      - "scripts/**"
+      - "tools/**"
+      - "android.sh"
 
 jobs:
   build-lts-on-linux:
@@ -31,7 +31,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        architecture: [ 'arm-v7a', 'arm64-v8a', 'x86', 'x86-64' ]
+        architecture: ["arm-v7a", "arm64-v8a", "x86", "x86-64"]
     defaults:
       run:
         shell: bash
@@ -40,8 +40,8 @@ jobs:
       - name: set up adopt jdk 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
-          java-version: '17'
+          distribution: "adopt"
+          java-version: "17"
       - name: run the build script
         run: |
           DISABLED_ARCHS=$(case "${{ matrix.architecture }}" in
@@ -59,6 +59,46 @@ jobs:
               ;;
           esac)
           ./android.sh --lts --disable-arm-v7a-neon --enable-cpu-features $DISABLED_ARCHS
+      - name: create artifacts folder and zip
+        if: success()
+        run: |
+          mkdir -p artifacts
+          cd prebuilt
+          zip -r ../artifacts/ffmpeg-kit-${{ matrix.architecture }}.zip android-*/ bundle-android-aar-lts/ || true
+          cd ..
+      - name: upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-kit-${{ matrix.architecture }}
+          path: artifacts/
+          retention-days: 30
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
+
+  commit-artifacts:
+    name: commit artifacts to repo
+    needs: build-lts-on-linux
+    runs-on: ubuntu-24.04
+    if: success()
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts-temp
+      - name: organize artifacts
+        run: |
+          mkdir -p artifacts
+          find artifacts-temp -name "*.zip" -exec mv {} artifacts/ \;
+          ls -lh artifacts/
+      - name: commit and push artifacts
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add artifacts/
+          git diff --staged --quiet || git commit -m "🤖 Auto-build: Add artifacts from ${{ github.sha }}"
+          git push
