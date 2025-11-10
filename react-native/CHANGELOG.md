@@ -1,5 +1,13 @@
 # Changelog
 
+## <small>6.1.2 (2025-11-10)</small>
+
+* refactor: streamline artifact handling and update release workflow for HTTPS variant ([7140a39](https://github.com/2004durgesh/ffmpeg-kit/commit/7140a39))
+* 🤖 Auto-build: Add artifacts from b58c6bf4af574303de743d1d27af4aeaa11e09bd ([3047b65](https://github.com/2004durgesh/ffmpeg-kit/commit/3047b65))
+* command change in dockerfile ([b58c6bf](https://github.com/2004durgesh/ffmpeg-kit/commit/b58c6bf))
+* docker init ([de6cc9a](https://github.com/2004durgesh/ffmpeg-kit/commit/de6cc9a))
+* Remove aniyomi-mpv-lib from tracking (added to .gitignore) ([514b4bc](https://github.com/2004durgesh/ffmpeg-kit/commit/514b4bc))
+
 ## <small>6.1.1 (2025-10-20)</small>
 
 * chore: update package name ([6034f23](https://github.com/2004durgesh/ffmpeg-kit/commit/6034f23))

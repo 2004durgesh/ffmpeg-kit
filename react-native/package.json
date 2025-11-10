@@ -1,6 +1,6 @@
 {
   "name": "react-native-ffmpeg-kit",
-  "version": "6.1.1",
+  "version": "6.1.2",
   "description": "FFmpeg Kit for React Native",
   "main": "src/index",
   "types": "src/index.d.ts",
