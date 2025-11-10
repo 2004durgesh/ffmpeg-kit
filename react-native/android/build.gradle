@@ -125,5 +125,26 @@ repositories {
 
 dependencies {
   api 'com.facebook.react:react-native:+'
-  implementation(name: 'ffmpeg-kit-full-gpl', ext: 'aar')
+  
+  // Dynamically find any ffmpeg-kit AAR in the user's android/libs/ folder
+  // Supports any variant: min, https, audio, video, full, full-gpl, etc.
+  def ffmpegKitAarFound = false
+  def libsDir = new File(rootProject.projectDir, '/libs')
+  
+  if (libsDir.exists()) {
+    libsDir.eachFileMatch(~/ffmpeg-kit-.*\.aar/) { file ->
+      def aarName = file.name.replaceAll('\\.aar$', '')
+      implementation(name: aarName, ext: 'aar')
+      logger.info("react-native-ffmpeg-kit: Using local AAR: ${aarName}")
+      ffmpegKitAarFound = true
+    }
+  }
+  
+  // Fallback to Maven Central if no local AAR found
+  if (!ffmpegKitAarFound) {
+    def variant = project.hasProperty('ffmpegKitVariant') ? project.property('ffmpegKitVariant') : 'https'
+    def version = project.hasProperty('ffmpegKitVersion') ? project.property('ffmpegKitVersion') : '6.0-2'
+    implementation "com.arthenica:ffmpeg-kit-${variant}:${version}"
+    logger.info("react-native-ffmpeg-kit: Using Maven Central: ffmpeg-kit-${variant}:${version}")
+  }
 }

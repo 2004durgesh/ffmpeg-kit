@@ -59,46 +59,6 @@ jobs:
               ;;
           esac)
           ./android.sh --lts --disable-arm-v7a-neon --enable-cpu-features $DISABLED_ARCHS
-      - name: create artifacts folder and zip
-        if: success()
-        run: |
-          mkdir -p artifacts
-          cd prebuilt
-          zip -r ../artifacts/ffmpeg-kit-${{ matrix.architecture }}.zip android-*/ bundle-android-aar-lts/ || true
-          cd ..
-      - name: upload build artifacts
-        if: success()
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-kit-${{ matrix.architecture }}
-          path: artifacts/
-          retention-days: 30
       - name: print build logs
         if: ${{ always() }}
         run: cat build.log
-
-  commit-artifacts:
-    name: commit artifacts to repo
-    needs: build-lts-on-linux
-    runs-on: ubuntu-24.04
-    if: success()
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts-temp
-      - name: organize artifacts
-        run: |
-          mkdir -p artifacts
-          find artifacts-temp -name "*.zip" -exec mv {} artifacts/ \;
-          ls -lh artifacts/
-      - name: commit and push artifacts
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add artifacts/
-          git diff --staged --quiet || git commit -m "🤖 Auto-build: Add artifacts from ${{ github.sha }}"
-          git push
