@@ -36,8 +36,9 @@ jobs:
           - package: https
             flags: '--enable-openssl --enable-android-media-codec --enable-android-zlib'
           # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license: GPL v3).
+          # gnutls disabled + openssl for TLS, matching the iOS full-gpl variant.
           - package: full-gpl
-            flags: '--full --enable-gpl --disable-lib-srt --enable-android-media-codec --enable-android-zlib'
+            flags: '--full --enable-gpl --disable-lib-srt --disable-lib-gnutls --enable-openssl --enable-android-media-codec --enable-android-zlib'
     defaults:
       run:
         shell: bash

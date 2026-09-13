@@ -52,9 +52,11 @@ jobs:
           - package: https
             flags: '--enable-openssl --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib'
           # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license:
-          # GPL v3). srt disabled to match the Android 'full-gpl' package.
+          # GPL v3). gnutls disabled (its autopoint/gettext bootstrap breaks on
+          # modern macOS) with openssl for TLS instead, mirroring upstream's
+          # periodic-builds-apple.yml (--disable-lib-gnutls). srt disabled too.
           - package: full-gpl
-            flags: '--full --enable-gpl --disable-lib-srt --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib'
+            flags: '--full --enable-gpl --disable-lib-srt --disable-lib-gnutls --enable-openssl --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib'
     defaults:
       run:
         shell: bash
