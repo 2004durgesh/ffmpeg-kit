@@ -33,12 +33,15 @@ jobs:
         include:
           # LGPL default: TLS/https via OpenSSL (Apache-2.0), matching the iOS
           # https variant and avoiding gnutls' heavy autotools dependency chain.
+          # 32-bit x86 disabled: android.sh's openssl.sh rejects openssl on x86
+          # (obsolete emulator-only ABI; x86_64 is kept).
           - package: https
-            flags: '--enable-openssl --enable-android-media-codec --enable-android-zlib'
+            flags: '--enable-openssl --disable-x86 --enable-android-media-codec --enable-android-zlib'
           # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license: GPL v3).
           # gnutls disabled + openssl for TLS, matching the iOS full-gpl variant.
+          # 32-bit x86 disabled for the same openssl reason as above.
           - package: full-gpl
-            flags: '--full --enable-gpl --disable-lib-srt --disable-lib-gnutls --enable-openssl --enable-android-media-codec --enable-android-zlib'
+            flags: '--full --enable-gpl --disable-lib-srt --disable-lib-gnutls --enable-openssl --disable-x86 --enable-android-media-codec --enable-android-zlib'
     defaults:
       run:
         shell: bash
