@@ -31,9 +31,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # LGPL default: TLS/https support (gnutls pulls gmp).
+          # LGPL default: TLS/https via OpenSSL (Apache-2.0), matching the iOS
+          # https variant and avoiding gnutls' heavy autotools dependency chain.
           - package: https
-            flags: '--enable-gnutls --enable-android-media-codec --enable-android-zlib'
+            flags: '--enable-openssl --enable-android-media-codec --enable-android-zlib'
           # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license: GPL v3).
           - package: full-gpl
             flags: '--full --enable-gpl --disable-lib-srt --enable-android-media-codec --enable-android-zlib'
@@ -54,7 +55,7 @@ jobs:
       - name: install build prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y gperf groff autogen autopoint autoconf automake libtool libtool-bin pkg-config nasm yasm bison meson ninja-build ragel texinfo doxygen gtk-doc-tools
+          sudo apt-get install -y gperf groff autogen autopoint autoconf automake libtool libtool-bin pkg-config nasm yasm bison meson ninja-build ragel texinfo doxygen gtk-doc-tools libtasn1-bin
 
       - name: remove conflicting cmake versions
         run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1" || true
