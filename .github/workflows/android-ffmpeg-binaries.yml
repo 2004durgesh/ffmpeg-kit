@@ -1,0 +1,94 @@
+name: android ffmpeg binaries
+
+# Builds the FFmpegKit Android AAR(s) from source (this repo is the "binary
+# factory") and publishes them as GitHub Release assets. The react-native
+# package consumes them via the ivy repo declared in
+# react-native/android/build.gradle, resolving:
+#   https://github.com/<owner>/ffmpeg-kit/releases/download/<tag>/ffmpeg-kit-<package>.aar
+#
+# Trigger:
+#   - workflow_dispatch: build on demand (uploads a workflow artifact)
+#   - push tag 'ffmpeg-android-*': build + attach the AARs to that release
+#     (the tag is what react-native/android/build.gradle's ffmpegKitReleaseTag
+#     must point at)
+
+on:
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: 'Comma-less matrix is used; this input is informational only.'
+        required: false
+        default: 'https, full-gpl'
+  push:
+    tags:
+      - 'ffmpeg-android-*'
+
+jobs:
+  build:
+    name: build ${{ matrix.package }} aar
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # LGPL default: TLS/https support (gnutls pulls gmp).
+          - package: https
+            flags: '--enable-gnutls --enable-android-media-codec --enable-android-zlib'
+          # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license: GPL v3).
+          - package: full-gpl
+            flags: '--full --enable-gpl --disable-lib-srt --enable-android-media-codec --enable-android-zlib'
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up jdk 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: remove conflicting cmake versions
+        run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1" || true
+
+      - name: set up android ndk r25b
+        run: |
+          curl -s "https://dl.google.com/android/repository/android-ndk-r25b-linux.zip" -o ndk.zip
+          unzip -q -o ndk.zip -d .ndk
+          echo "ANDROID_NDK_ROOT=$PWD/.ndk/$(ls .ndk)" >> "$GITHUB_ENV"
+
+      - name: build ffmpeg-kit (${{ matrix.package }})
+        run: ./android.sh -d ${{ matrix.flags }}
+
+      - name: collect + name the aar
+        run: |
+          SRC="prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar"
+          test -f "$SRC" || { echo "AAR not found at $SRC"; exit 1; }
+          mkdir -p dist
+          cp "$SRC" "dist/ffmpeg-kit-${{ matrix.package }}.aar"
+          ls -lh dist
+
+      - name: print build logs
+        if: ${{ always() }}
+        run: tail -200 build.log || true
+
+      - name: print ffmpeg config log on failure
+        if: ${{ failure() }}
+        run: '[[ -f ./src/ffmpeg/ffbuild/config.log ]] && tail -80 ./src/ffmpeg/ffbuild/config.log || true'
+
+      - name: upload workflow artifact (dispatch runs)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-kit-${{ matrix.package }}-aar
+          path: dist/ffmpeg-kit-${{ matrix.package }}.aar
+          if-no-files-found: error
+
+      - name: attach to github release (tag runs)
+        if: ${{ startsWith(github.ref, 'refs/tags/ffmpeg-android-') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: FFmpegKit Android binaries ${{ github.ref_name }}
+          files: dist/ffmpeg-kit-${{ matrix.package }}.aar

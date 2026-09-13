@@ -46,10 +46,27 @@ android {
 repositories {
   google()
   mavenCentral()
+
+  // FFmpeg AARs published as GitHub Release assets by the "android ffmpeg
+  // binaries" workflow. This ivy repo maps a maven-style coordinate onto the
+  // release asset URL (no authentication required):
+  //   com.arthenica.ffmpegkit:ffmpeg-kit-<package>:<tag>
+  //     -> .../releases/download/<tag>/ffmpeg-kit-<package>.aar
+  ivy {
+    url "https://github.com/2004durgesh/ffmpeg-kit/releases/download"
+    patternLayout {
+      artifact "[revision]/[artifact].[ext]"
+    }
+    metadataSources { artifact() }
+    content { includeGroup "com.arthenica.ffmpegkit" }
+  }
 }
 
 dependencies {
   implementation "com.facebook.react:react-android"
 
-  implementation(name: "ffmpeg-kit-${safeExtGet('ffmpegKitPackage', 'https')}", ext: "aar")
+  // FFmpeg native binaries (AAR) resolved from the GitHub Release above. Override
+  // via root-project ext: ffmpegKitPackage (default "https"; e.g. "full-gpl") and
+  // ffmpegKitReleaseTag (default "ffmpeg-android-6.0.2").
+  implementation "com.arthenica.ffmpegkit:ffmpeg-kit-${safeExtGet('ffmpegKitPackage', 'https')}:${safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.2')}@aar"
 }
