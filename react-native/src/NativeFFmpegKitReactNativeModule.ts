@@ -13,7 +13,7 @@
  *    replacing the legacy NativeEventEmitter + addListener/removeListeners pair.
  */
 import type {TurboModule} from 'react-native';
-import type {EventEmitter} from 'react-native';
+import type {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
 import {TurboModuleRegistry} from 'react-native';
 
 /** Payload for the `FFmpegKitLogCallbackEvent`. */

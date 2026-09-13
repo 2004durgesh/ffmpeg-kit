@@ -40,6 +40,9 @@ android.iml
 #
 example/ios/Pods
 
+# FFmpeg xcframeworks downloaded by the podspec prepare_command
+ios/FFmpegKitFrameworks/
+
 # node.js
 #
 node_modules/

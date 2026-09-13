@@ -14,6 +14,11 @@ const config = {
   resolver: {
     extraNodeModules: {
       [pkg.name]: root,
+      // Files under the library root resolve react / react-native from the
+      // example's own copy (avoids duplicate-module errors and unresolved
+      // 'react-native' imports inside the library src).
+      'react': path.join(__dirname, 'node_modules', 'react'),
+      'react-native': path.join(__dirname, 'node_modules', 'react-native'),
     },
     blockList: [
       new RegExp(`^${escape(path.join(root, 'node_modules', 'react'))}\\/.*$`),
