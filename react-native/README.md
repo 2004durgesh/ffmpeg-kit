@@ -26,24 +26,33 @@ yarn add react-native-ffmpeg-kit
 # or: npm install react-native-ffmpeg-kit
 ```
 
-### Android
+No extra native setup is required. The Android build automatically downloads
+the correct FFmpeg `.aar` from this fork's GitHub Releases at build time —
+no repository declarations or Maven/ivy config needed in your project.
 
-The native FFmpeg `.aar` is resolved automatically from this fork's GitHub
-Releases (no extra setup). Two things are configurable from your app's
-`android/build.gradle` root `ext` block:
+### Android (optional customization)
+
+Two values can be overridden from your app's root `android/build.gradle` `ext`
+block. Both are optional — defaults work out of the box.
 
 ```gradle
 ext {
-    // Which prebuilt package variant to use. Default: "https".
-    ffmpegKitPackage = "full-gpl"     // e.g. for x264 / x265 / xvid / vid.stab
-    // Which binary release tag to pull. Default: "ffmpeg-android-6.0.2".
+    // Prebuilt variant. Default: "https" (LGPL, includes TLS/HLS support).
+    // Use "full-gpl" for x264 / x265 / xvid / vid.stab (GPL v3).
+    ffmpegKitPackage = "https"
+
+    // GitHub Release tag to pull the AAR from. Default: "ffmpeg-android-6.0.2".
     ffmpegKitReleaseTag = "ffmpeg-android-6.0.2"
+
+    // Fork to pull binaries from. Default: "2004durgesh/ffmpeg-kit".
+    // Override only if you host your own binary releases.
+    ffmpegKitRepo = "2004durgesh/ffmpeg-kit"
 }
 ```
 
-Available Android variants: `https` (LGPL, TLS) and `full-gpl` (all libraries,
-**effective license GPL v3**). More can be produced from the
-`android ffmpeg binaries` workflow.
+Available Android variants: `https` (LGPL, TLS/HLS) and `full-gpl` (all
+libraries, **effective license GPL v3**). More variants can be produced from
+the `android ffmpeg binaries` workflow.
 
 ### iOS
 
@@ -97,13 +106,26 @@ etc.) see the upstream
 [usage guide](https://github.com/arthenica/ffmpeg-kit/tree/main/react-native) —
 all of it applies unchanged.
 
+## How Android binary resolution works
+
+The library's `android/build.gradle` downloads the FFmpeg `.aar` directly from
+this fork's GitHub Releases during the Gradle configuration phase using
+`ant.get`, then wires it in as a local `files()` dependency. This means:
+
+- **No ivy/Maven repo declarations** needed in the consuming app.
+- The AAR is cached in the module's Gradle build directory — subsequent builds
+  are instant.
+- The download URL follows the pattern:
+  `https://github.com/<ffmpegKitRepo>/releases/download/<ffmpegKitReleaseTag>/ffmpeg-kit-<ffmpegKitPackage>.aar`
+
 ## What changed vs. upstream
 
 - Converted to a **TurboModule** (codegen spec, typed events); dropped the
   `NativeEventEmitter`/legacy bridge path.
-- Baseline bumped to **RN 0.86 / React 19**.
+- Baseline bumped to **RN 0.80 / React 19**.
 - Native binaries are **rebuilt and published by this fork** rather than pulled
   from the retired ARTHENICA hosting.
+- Android AAR is fetched at build time (no custom repo config required by consumers).
 - Published under the name **`react-native-ffmpeg-kit`**.
 
 ## License
