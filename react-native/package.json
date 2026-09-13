@@ -6,6 +6,25 @@
   "types": "src/index.d.ts",
   "react-native": "src/index",
   "source": "src/index",
+  "files": [
+    "src",
+    "android",
+    "ios",
+    "ffmpeg-kit-react-native.podspec",
+    "README.md",
+    "!android/build",
+    "!android/.gradle",
+    "!**/__tests__",
+    "!**/.DS_Store"
+  ],
+  "codegenConfig": {
+    "name": "RNFFmpegKitSpec",
+    "type": "modules",
+    "jsSrcsDir": "src",
+    "android": {
+      "javaPackageName": "com.arthenica.ffmpegkit.reactnative"
+    }
+  },
   "scripts": {
     "test": "jest",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
@@ -30,25 +49,26 @@
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.7.0",
-    "@react-native-community/eslint-config": "^2.0.0",
+    "@react-native/babel-preset": "0.86.0",
+    "@react-native/eslint-config": "0.86.0",
     "@release-it/conventional-changelog": "^7.0.0",
     "@types/jest": "^29.5.4",
-    "@types/react": "^16.9.19",
-    "@types/react-native": "^0.62.13",
+    "@types/react": "^19.2.0",
     "commitlint": "^17.7.1",
-    "eslint": "^8.48.0",
+    "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "jest": "^29.6.4",
     "pod-install": "^0.1.39",
     "prettier": "^3.0.2",
-    "react": "^16.13.1",
-    "react-native": "^0.63.4",
-    "release-it": "^16.1.5"
+    "react": "19.2.3",
+    "react-native": "0.86.0",
+    "release-it": "^16.1.5",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
-    "react": "*",
-    "react-native": "*"
+    "react": ">=19.0.0",
+    "react-native": ">=0.80.0"
   },
   "jest": {
     "preset": "react-native"
@@ -78,7 +98,7 @@
   "eslintConfig": {
     "root": true,
     "extends": [
-      "@react-native-community",
+      "@react-native",
       "prettier"
     ],
     "rules": {

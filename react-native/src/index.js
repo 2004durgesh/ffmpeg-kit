@@ -1,6 +1,4 @@
-import {NativeEventEmitter, NativeModules} from 'react-native';
-
-const {FFmpegKitReactNativeModule} = NativeModules;
+import FFmpegKitReactNativeModule from './NativeFFmpegKitReactNativeModule';
 
 const ffmpegSessionCompleteCallbackMap = new Map()
 const ffprobeSessionCompleteCallbackMap = new Map()
@@ -8,10 +6,6 @@ const mediaInformationSessionCompleteCallbackMap = new Map()
 const logCallbackMap = new Map()
 const statisticsCallbackMap = new Map()
 const logRedirectionStrategyMap = new Map()
-
-const eventLogCallbackEvent = "FFmpegKitLogCallbackEvent";
-const eventStatisticsCallbackEvent = "FFmpegKitStatisticsCallbackEvent";
-const eventCompleteCallbackEvent = "FFmpegKitCompleteCallbackEvent";
 
 export const LogRedirectionStrategy = {
   ALWAYS_PRINT_LOGS: 0,
@@ -29,31 +23,9 @@ export const Signal = {
   SIGINT: 2, SIGQUIT: 3, SIGPIPE: 13, SIGTERM: 15, SIGXCPU: 24
 }
 
-class FFmpegKitReactNativeEventEmitter extends NativeEventEmitter {
-  constructor() {
-    super(FFmpegKitReactNativeModule);
-  }
-
-  addListener(eventType, listener, context) {
-    let subscription = super.addListener(eventType, listener, context);
-    subscription.eventType = eventType;
-    let subscriptionRemove = subscription.remove;
-    subscription.remove = () => {
-      if (super.removeSubscription != null) {
-        super.removeSubscription(subscription);
-      } else if (subscriptionRemove != null) {
-        subscriptionRemove();
-      }
-    };
-    return subscription;
-  }
-
-  removeSubscription(subscription) {
-    if (super.removeSubscription) {
-      super.removeSubscription(subscription);
-    }
-  }
-}
+// Session log/statistics/complete callbacks are delivered via codegen-typed
+// events declared on the TurboModule spec (see
+// NativeFFmpegKitReactNativeModule.ts), replacing the legacy NativeEventEmitter.
 
 /**
  * <p>Common interface for all <code>FFmpegKit</code> sessions.
@@ -1736,7 +1708,6 @@ class FFmpegKitFactory {
 
 class FFmpegKitInitializer {
   static #initialized = false;
-  static #eventEmitter = new FFmpegKitReactNativeEventEmitter();
 
   static processLogCallbackEvent(event) {
     const log = FFmpegKitFactory.mapToLog(event)
@@ -1906,9 +1877,9 @@ class FFmpegKitInitializer {
 
     console.log("Loading ffmpeg-kit-react-native.");
 
-    this.#eventEmitter.addListener(eventLogCallbackEvent, FFmpegKitInitializer.processLogCallbackEvent);
-    this.#eventEmitter.addListener(eventStatisticsCallbackEvent, FFmpegKitInitializer.processStatisticsCallbackEvent);
-    this.#eventEmitter.addListener(eventCompleteCallbackEvent, FFmpegKitInitializer.processCompleteCallbackEvent);
+    FFmpegKitReactNativeModule.onFFmpegKitLogCallbackEvent(FFmpegKitInitializer.processLogCallbackEvent);
+    FFmpegKitReactNativeModule.onFFmpegKitStatisticsCallbackEvent(FFmpegKitInitializer.processStatisticsCallbackEvent);
+    FFmpegKitReactNativeModule.onFFmpegKitCompleteCallbackEvent(FFmpegKitInitializer.processCompleteCallbackEvent);
 
     FFmpegKitFactory.setLogLevel(await FFmpegKitReactNativeModule.getLogLevel());
     const version = FFmpegKitFactory.getVersion();
