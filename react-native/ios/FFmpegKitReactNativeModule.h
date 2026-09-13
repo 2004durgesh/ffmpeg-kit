@@ -18,9 +18,8 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <ffmpegkit/FFmpegKitConfig.h>
 #import <React/RCTBridgeModule.h>
-#import <React/RCTEventEmitter.h>
+#import <RNFFmpegKitSpec/RNFFmpegKitSpec.h>
 
-@interface FFmpegKitReactNativeModule : RCTEventEmitter<RCTBridgeModule>
+@interface FFmpegKitReactNativeModule : NativeFFmpegKitReactNativeModuleSpecBase <RCTBridgeModule>
 @end
