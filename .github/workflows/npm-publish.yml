@@ -43,6 +43,14 @@ jobs:
           fi
 
       - name: publish
-        run: npm publish --provenance --access public
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "Publishing prerelease $VERSION under dist-tag 'next' (opt-in via @next)"
+            npm publish --provenance --access public --tag next
+          else
+            echo "Publishing $VERSION as 'latest'"
+            npm publish --provenance --access public
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
