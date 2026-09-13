@@ -46,10 +46,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # LGPL default: TLS/https support (gnutls pulls gmp) plus the Apple
-          # system codecs. Mirrors the Android 'https' package.
+          # LGPL default: TLS/https support via OpenSSL (Apache-2.0; avoids the
+          # gnutls autotools/autopoint bootstrap which breaks on modern macOS
+          # gettext) plus the Apple system codecs.
           - package: https
-            flags: '--enable-gnutls --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib'
+            flags: '--enable-openssl --enable-ios-audiotoolbox --enable-ios-avfoundation --enable-ios-bzip2 --enable-ios-libiconv --enable-ios-videotoolbox --enable-ios-zlib'
           # Full + GPL: adds x264/x265/xvid/vid.stab etc. (effective license:
           # GPL v3). srt disabled to match the Android 'full-gpl' package.
           - package: full-gpl

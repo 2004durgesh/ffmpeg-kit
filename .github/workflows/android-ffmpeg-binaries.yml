@@ -49,6 +49,13 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # gperf is required by libiconv's alias-table generation; the rest are the
+      # autotools/build helpers the external libraries (gnutls, etc.) expect.
+      - name: install build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gperf autogen autopoint autoconf automake libtool pkg-config nasm yasm meson ninja-build ragel texinfo gtk-doc-tools
+
       - name: remove conflicting cmake versions
         run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1" || true
 
