@@ -54,7 +54,7 @@ jobs:
       - name: install build prerequisites
         run: |
           sudo apt-get update
-          sudo apt-get install -y gperf autogen autopoint autoconf automake libtool pkg-config nasm yasm meson ninja-build ragel texinfo gtk-doc-tools
+          sudo apt-get install -y gperf groff autogen autopoint autoconf automake libtool libtool-bin pkg-config nasm yasm bison meson ninja-build ragel texinfo doxygen gtk-doc-tools
 
       - name: remove conflicting cmake versions
         run: ${ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager --uninstall "cmake;3.10.2.4988404" "cmake;3.18.1" || true
