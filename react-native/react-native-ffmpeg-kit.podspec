@@ -48,6 +48,11 @@ Pod::Spec.new do |s|
   s.requires_arc      = true
   s.static_framework  = true
 
+  # The module is ObjC++ (.mm) for the TurboModule glue, which compiles the
+  # ffmpegkit framework headers under stricter C++ rules; suppress the enum
+  # narrowing diagnostic those headers trip (harmless, C-only enums).
+  s.compiler_flags = '-Wno-c++11-narrowing'
+
   s.source       = { :git => "https://github.com/2004durgesh/ffmpeg-kit.git", :tag => "react.native.v#{s.version}" }
 
   s.default_subspec   = 'https'
@@ -85,13 +90,13 @@ Pod::Spec.new do |s|
   # are dropped: this fork is New-Architecture-only, so the SDK 10 `-lts`
   # deployment targets no longer apply.
   s.subspec 'https' do |ss|
-      ss.source_files          = '**/FFmpegKitReactNativeModule.{h,mm}'
+      ss.source_files          = 'ios/FFmpegKitReactNativeModule.{h,mm}'
       ss.vendored_frameworks   = "#{ffmpeg_kit_vendor_dir}/*.xcframework"
       ss.ios.deployment_target = '12.1'
   end
 
   s.subspec 'full-gpl' do |ss|
-      ss.source_files          = '**/FFmpegKitReactNativeModule.{h,mm}'
+      ss.source_files          = 'ios/FFmpegKitReactNativeModule.{h,mm}'
       ss.vendored_frameworks   = "#{ffmpeg_kit_vendor_dir}/*.xcframework"
       ss.ios.deployment_target = '12.1'
   end

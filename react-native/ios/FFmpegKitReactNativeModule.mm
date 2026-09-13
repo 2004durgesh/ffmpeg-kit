@@ -20,11 +20,28 @@
 #import "FFmpegKitReactNativeModule.h"
 #import <RNFFmpegKitSpec/RNFFmpegKitSpec.h>
 
-#import <ffmpegkit/FFmpegKit.h>
-#import <ffmpegkit/FFprobeKit.h>
+// Import each ffmpegkit header explicitly: when the framework is consumed as a
+// vendored xcframework (rather than the original CocoaPods module) `#import
+// <ffmpegkit/FFmpegKit.h>` resolves textually and does NOT pull in the rest of
+// the module (e.g. FFmpegKitConfig), so list every class the module uses.
+#import <ffmpegkit/AbstractSession.h>
 #import <ffmpegkit/ArchDetect.h>
+#import <ffmpegkit/FFmpegKit.h>
+#import <ffmpegkit/FFmpegKitConfig.h>
+#import <ffmpegkit/FFmpegSession.h>
+#import <ffmpegkit/FFprobeKit.h>
+#import <ffmpegkit/FFprobeSession.h>
+#import <ffmpegkit/Level.h>
+#import <ffmpegkit/Log.h>
+#import <ffmpegkit/LogRedirectionStrategy.h>
 #import <ffmpegkit/MediaInformation.h>
+#import <ffmpegkit/MediaInformationJsonParser.h>
+#import <ffmpegkit/MediaInformationSession.h>
 #import <ffmpegkit/Packages.h>
+#import <ffmpegkit/ReturnCode.h>
+#import <ffmpegkit/Session.h>
+#import <ffmpegkit/SessionState.h>
+#import <ffmpegkit/Statistics.h>
 
 static NSString *const PLATFORM_NAME = @"ios";
 
@@ -513,7 +530,7 @@ RCT_EXPORT_METHOD(getLogLevel:(RCTPromiseResolveBlock)resolve reject:(RCTPromise
 }
 
 RCT_EXPORT_METHOD(setLogLevel:(double)level resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig setLogLevel:level];
+    [FFmpegKitConfig setLogLevel:(Level)(int)level];
     resolve(nil);
 }
 
@@ -553,7 +570,7 @@ RCT_EXPORT_METHOD(clearSessions:(RCTPromiseResolveBlock)resolve reject:(RCTPromi
 }
 
 RCT_EXPORT_METHOD(getSessionsByState:(double)sessionState resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    resolve([FFmpegKitReactNativeModule toSessionArray:[FFmpegKitConfig getSessionsByState:sessionState]]);
+    resolve([FFmpegKitReactNativeModule toSessionArray:[FFmpegKitConfig getSessionsByState:(SessionState)(int)sessionState]]);
 }
 
 RCT_EXPORT_METHOD(getLogRedirectionStrategy:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
@@ -561,7 +578,7 @@ RCT_EXPORT_METHOD(getLogRedirectionStrategy:(RCTPromiseResolveBlock)resolve reje
 }
 
 RCT_EXPORT_METHOD(setLogRedirectionStrategy:(double)logRedirectionStrategy resolve:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
-    [FFmpegKitConfig setLogRedirectionStrategy:logRedirectionStrategy];
+    [FFmpegKitConfig setLogRedirectionStrategy:(LogRedirectionStrategy)(int)logRedirectionStrategy];
     resolve(nil);
 }
 

@@ -46,27 +46,34 @@ android {
 repositories {
   google()
   mavenCentral()
+}
 
-  // FFmpeg AARs published as GitHub Release assets by the "android ffmpeg
-  // binaries" workflow. This ivy repo maps a maven-style coordinate onto the
-  // release asset URL (no authentication required):
-  //   com.arthenica.ffmpegkit:ffmpeg-kit-<package>:<tag>
-  //     -> .../releases/download/<tag>/ffmpeg-kit-<package>.aar
-  ivy {
-    url "https://github.com/2004durgesh/ffmpeg-kit/releases/download"
-    patternLayout {
-      artifact "[revision]/[artifact].[ext]"
-    }
-    metadataSources { artifact() }
-    content { includeGroup "com.arthenica.ffmpegkit" }
-  }
+// FFmpeg native binaries (AAR) are published as GitHub Release assets by the
+// "android ffmpeg binaries" workflow. Gradle repositories are NOT inherited by
+// consumers, so rather than a custom repo (which every consuming app would have
+// to re-declare) we download the AAR at configuration time and consume it as a
+// local file dependency -- a file dependency DOES flow into the consuming app's
+// runtime classpath with no extra setup. Override via root-project ext:
+//   ffmpegKitPackage    (default "https"; e.g. "full-gpl")
+//   ffmpegKitReleaseTag (default "ffmpeg-android-6.0.2")
+//   ffmpegKitRepo       (default "2004durgesh/ffmpeg-kit")
+def ffmpegKitPackage = safeExtGet('ffmpegKitPackage', 'https')
+def ffmpegKitReleaseTag = safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.2')
+def ffmpegKitRepo = safeExtGet('ffmpegKitRepo', '2004durgesh/ffmpeg-kit')
+def ffmpegKitAar = new File(layout.buildDirectory.get().asFile, "ffmpeg-kit/ffmpeg-kit-${ffmpegKitPackage}.aar")
+if (!ffmpegKitAar.exists()) {
+  ffmpegKitAar.parentFile.mkdirs()
+  def ffmpegKitAarUrl = "https://github.com/${ffmpegKitRepo}/releases/download/${ffmpegKitReleaseTag}/ffmpeg-kit-${ffmpegKitPackage}.aar"
+  logger.lifecycle("react-native-ffmpeg-kit: downloading ${ffmpegKitAarUrl}")
+  ant.get(src: ffmpegKitAarUrl, dest: ffmpegKitAar)
 }
 
 dependencies {
   implementation "com.facebook.react:react-android"
+  implementation files(ffmpegKitAar)
 
-  // FFmpeg native binaries (AAR) resolved from the GitHub Release above. Override
-  // via root-project ext: ffmpegKitPackage (default "https"; e.g. "full-gpl") and
-  // ffmpegKitReleaseTag (default "ffmpeg-android-6.0.2").
-  implementation "com.arthenica.ffmpegkit:ffmpeg-kit-${safeExtGet('ffmpegKitPackage', 'https')}:${safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.2')}@aar"
+  // ffmpeg-kit's own runtime dependency. The AAR is consumed as a local file()
+  // dependency (above), which carries no transitive deps, so declare it here or
+  // FFmpegKitConfig.<clinit> throws NoClassDefFoundError for smartexception.
+  implementation "com.arthenica:smart-exception-java:0.2.1"
 }

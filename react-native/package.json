@@ -10,7 +10,7 @@
     "src",
     "android",
     "ios",
-    "ffmpeg-kit-react-native.podspec",
+    "react-native-ffmpeg-kit.podspec",
     "README.md",
     "!android/build",
     "!android/.gradle",
@@ -98,7 +98,8 @@
     },
     "plugins": {
       "@release-it/conventional-changelog": {
-        "preset": "angular"
+        "preset": "angular",
+        "infile": "CHANGELOG.md"
       }
     }
   },
