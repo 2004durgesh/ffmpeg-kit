@@ -82,6 +82,23 @@ Pod::Spec.new do |s|
     curl -fL --retry 3 --retry-delay 2 -o "${ZIP}" "${URL}"
     unzip -q -o "${ZIP}" -d "${DEST}"
     rm -f "${ZIP}"
+    # Some slices -- notably the maccatalyst versioned bundles -- lose their
+    # top-level framework symlinks when the release zip is produced, so the
+    # slice binary is only reachable at Versions/A/<name>. CocoaPods reads the
+    # flat path <name>.framework/<name>, finds nothing, and misclassifies the
+    # slice as static, aborting with "contains both static and dynamic
+    # frameworks". Rebuild the standard symlinks for every versioned slice.
+    find "${DEST}" -type d -name '*.framework' | while read -r fw; do
+      name="$(basename "${fw}" .framework)"
+      [ -d "${fw}/Versions/A" ] || continue
+      ( cd "${fw}/Versions" && ln -sfn A Current )
+      ( cd "${fw}" && ln -sfn "Versions/Current/${name}" "${name}" )
+      for item in Headers Modules Resources; do
+        if [ -e "${fw}/Versions/A/${item}" ]; then
+          ( cd "${fw}" && ln -sfn "Versions/Current/${item}" "${item}" )
+        fi
+      done
+    done
     echo "[ffmpeg-kit-react-native] extracted xcframeworks into ${DEST}"
   CMD
 
