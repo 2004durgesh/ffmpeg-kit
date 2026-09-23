@@ -1,6 +1,6 @@
 {
   "name": "react-native-ffmpeg-kit",
-  "version": "7.0.0-beta.1",
+  "version": "7.0.0-beta.2",
   "description": "FFmpeg Kit for React Native (New Architecture / TurboModule fork)",
   "main": "src/index",
   "types": "src/index.d.ts",
