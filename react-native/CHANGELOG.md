@@ -1,5 +1,11 @@
 # Changelog
 
+# [7.0.0-beta.4](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.3...v7.0.0-beta.4) (2026-10-05)
+
+### Bug Fixes
+
+* update comments for clarity in ios ffmpeg binaries workflow and podspec ([94d2445](https://github.com/2004durgesh/ffmpeg-kit/commit/94d2445f010eb9fb7bd4f3dc5c3a419969917eaa))
+
 # [7.0.0-beta.3](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.2...v7.0.0-beta.3) (2026-09-23)
 
 ### Bug Fixes
