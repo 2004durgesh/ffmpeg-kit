@@ -14,6 +14,7 @@
     "README.md",
     "!android/build",
     "!android/.gradle",
+    "!ios/FFmpegKitFrameworks",
     "!**/__tests__",
     "!**/.DS_Store"
   ],

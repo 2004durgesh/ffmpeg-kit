@@ -109,8 +109,8 @@ jobs:
       # umbrella under prebuilt/bundle-apple-xcframework-ios (see
       # scripts/function-apple.sh get_xcframework_directory(), with
       # FFMPEG_KIT_BUILD_TYPE=ios and no --lts). Zip the *contents* of that
-      # directory so the *.xcframework bundles sit at the zip root (the podspec's
-      # prepare_command unzips them flat and vendors *.xcframework).
+      # directory so the *.xcframework bundles sit at the zip root (the podspec
+      # unzips them flat and vendors *.xcframework).
       - name: package xcframeworks into a zip
         run: |
           OUT_DIR="prebuilt/bundle-apple-xcframework-ios"
