@@ -55,10 +55,10 @@ repositories {
 // local file dependency -- a file dependency DOES flow into the consuming app's
 // runtime classpath with no extra setup. Override via root-project ext:
 //   ffmpegKitPackage    (default "https"; e.g. "full-gpl")
-//   ffmpegKitReleaseTag (default "ffmpeg-android-6.0.2")
+//   ffmpegKitReleaseTag (default "ffmpeg-android-6.0.3")
 //   ffmpegKitRepo       (default "2004durgesh/ffmpeg-kit")
 def ffmpegKitPackage = safeExtGet('ffmpegKitPackage', 'https')
-def ffmpegKitReleaseTag = safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.2')
+def ffmpegKitReleaseTag = safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.3')
 def ffmpegKitRepo = safeExtGet('ffmpegKitRepo', '2004durgesh/ffmpeg-kit')
 def ffmpegKitAar = new File(layout.buildDirectory.get().asFile, "ffmpeg-kit/ffmpeg-kit-${ffmpegKitPackage}.aar")
 if (!ffmpegKitAar.exists()) {

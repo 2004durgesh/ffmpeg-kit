@@ -41,8 +41,8 @@ ext {
     // Use "full-gpl" for x264 / x265 / xvid / vid.stab (GPL v3).
     ffmpegKitPackage = "https"
 
-    // GitHub Release tag to pull the AAR from. Default: "ffmpeg-android-6.0.2".
-    ffmpegKitReleaseTag = "ffmpeg-android-6.0.2"
+    // GitHub Release tag to pull the AAR from. Default: "ffmpeg-android-6.0.3".
+    ffmpegKitReleaseTag = "ffmpeg-android-6.0.3"
 
     // Fork to pull binaries from. Default: "2004durgesh/ffmpeg-kit".
     // Override only if you host your own binary releases.

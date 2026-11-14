@@ -11,6 +11,9 @@ name: android ffmpeg binaries
 #   - push tag 'ffmpeg-android-*': build + attach the AARs to that release
 #     (the tag is what react-native/android/build.gradle's ffmpegKitReleaseTag
 #     must point at)
+#
+# Every .so is linked with -Wl,-z,max-page-size=16384 (scripts/function-android.sh), so the AARs work on Android 15+
+# devices with 16 KB pages; ffmpeg-android-6.0.3 is the first tag built that way.
 
 on:
   workflow_dispatch:
