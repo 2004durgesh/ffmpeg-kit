@@ -115,6 +115,8 @@ export interface Spec extends TurboModule {
   isLTSBuild(): Promise<boolean>;
   getBuildDate(): Promise<string>;
   getPackageName(): Promise<string>;
+  /** The release tag the native binaries were downloaded from, e.g. "ffmpeg-android-6.0.3" */
+  getBinaryVersion(): Promise<string>;
   getExternalLibraries(): Promise<Object>;
 
   // ---- Environment / signals ------------------------------------------------

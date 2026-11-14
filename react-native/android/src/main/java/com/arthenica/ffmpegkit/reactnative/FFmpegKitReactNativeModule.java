@@ -846,6 +846,12 @@ public class FFmpegKitReactNativeModule extends NativeFFmpegKitReactNativeModule
   }
 
   @Override
+  public void getBinaryVersion(final Promise promise) {
+    // The release tag the AAR was downloaded from (android/build.gradle's ffmpegKitReleaseTag)
+    promise.resolve(com.arthenica.ffmpegkit.reactnative.BuildConfig.FFMPEG_KIT_RELEASE_TAG);
+  }
+
+  @Override
   public void getExternalLibraries(final Promise promise) {
     promise.resolve(toStringArray(Packages.getExternalLibraries()));
   }

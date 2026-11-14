@@ -701,6 +701,17 @@ RCT_EXPORT_METHOD(getPackageName:(RCTPromiseResolveBlock)resolve reject:(RCTProm
     resolve([Packages getPackageName]);
 }
 
+// The podspec defines FFMPEG_KIT_RELEASE_TAG as the release tag it downloaded the frameworks from
+#ifndef FFMPEG_KIT_RELEASE_TAG
+#define FFMPEG_KIT_RELEASE_TAG unknown
+#endif
+#define FFMPEG_KIT_STRINGIFY_(x) #x
+#define FFMPEG_KIT_STRINGIFY(x) FFMPEG_KIT_STRINGIFY_(x)
+
+RCT_EXPORT_METHOD(getBinaryVersion:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
+    resolve(@FFMPEG_KIT_STRINGIFY(FFMPEG_KIT_RELEASE_TAG));
+}
+
 RCT_EXPORT_METHOD(getExternalLibraries:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject) {
     resolve([Packages getExternalLibraries]);
 }

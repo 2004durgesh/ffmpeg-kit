@@ -116,14 +116,18 @@ Pod::Spec.new do |s|
   end
 
   # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/cocoapods/new_architecture.rb
+  # Reported by getBinaryVersion(), so the app can tell which frameworks it got
+  release_tag_define = "$(inherited) FFMPEG_KIT_RELEASE_TAG=#{ffmpeg_kit_release_tag}"
   if respond_to?(:install_modules_dependencies, true)
+    s.pod_target_xcconfig = { "GCC_PREPROCESSOR_DEFINITIONS" => release_tag_define }
     install_modules_dependencies(s)
   else
     s.pod_target_xcconfig = {
         "DEFINES_MODULE" => "YES",
         "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
         "OTHER_CPLUSPLUS_FLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -DRCT_NEW_ARCH_ENABLED=1",
-        "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+        "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+        "GCC_PREPROCESSOR_DEFINITIONS" => release_tag_define
     }
     s.dependency "React-Codegen"
     s.dependency "RCT-Folly"

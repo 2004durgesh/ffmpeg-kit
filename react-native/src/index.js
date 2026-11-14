@@ -897,12 +897,12 @@ export class FFmpegKitConfig {
   }
 
   /**
-   * <p>Returns FFmpegKit ReactNative library version.
+   * <p>Returns the version of the FFmpegKit binaries in use: the release they were downloaded from.
    *
    * @return FFmpegKit version
    */
   static async getVersion() {
-    return new Promise((resolve) => resolve(FFmpegKitFactory.getVersion()));
+    return FFmpegKitFactory.getVersion();
   }
 
   /**
@@ -1582,8 +1582,10 @@ class FFmpegKitFactory {
     }
   }
 
-  static getVersion() {
-    return "6.0.2";
+  // The binaries' release tag ("ffmpeg-android-6.0.3", "ffmpeg-ios-6.0.2") as a version; a custom tag comes back as is
+  static async getVersion() {
+    const tag = await FFmpegKitReactNativeModule.getBinaryVersion();
+    return tag.replace(/^ffmpeg-(android|ios)-/, "");
   }
 
   static getLogRedirectionStrategy(sessionId) {
@@ -1882,7 +1884,7 @@ class FFmpegKitInitializer {
     FFmpegKitReactNativeModule.onFFmpegKitCompleteCallbackEvent(FFmpegKitInitializer.processCompleteCallbackEvent);
 
     FFmpegKitFactory.setLogLevel(await FFmpegKitReactNativeModule.getLogLevel());
-    const version = FFmpegKitFactory.getVersion();
+    const version = await FFmpegKitFactory.getVersion();
     const platform = await FFmpegKitConfig.getPlatform();
     const arch = await ArchDetect.getArch();
     const packageName = await Packages.getPackageName();
