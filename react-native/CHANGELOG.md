@@ -1,5 +1,12 @@
 # Changelog
 
+# [7.0.0-beta.5](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.4...v7.0.0-beta.5) (2026-11-14)
+
+### Bug Fixes
+
+* **android:** cache the downloaded aar per release tag ([2fe81d0](https://github.com/2004durgesh/ffmpeg-kit/commit/2fe81d0e179f811c28f4ac9cb4b1ee61590c3b15))
+* **android:** link every native library with 16 kb page alignment ([26bdc80](https://github.com/2004durgesh/ffmpeg-kit/commit/26bdc8095804d5c8c4a6ede878ce60830ba74ca7))
+
 # [7.0.0-beta.4](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.3...v7.0.0-beta.4) (2026-10-05)
 
 ### Bug Fixes
