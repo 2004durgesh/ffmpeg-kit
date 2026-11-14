@@ -60,7 +60,8 @@ repositories {
 def ffmpegKitPackage = safeExtGet('ffmpegKitPackage', 'https')
 def ffmpegKitReleaseTag = safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.3')
 def ffmpegKitRepo = safeExtGet('ffmpegKitRepo', '2004durgesh/ffmpeg-kit')
-def ffmpegKitAar = new File(layout.buildDirectory.get().asFile, "ffmpeg-kit/ffmpeg-kit-${ffmpegKitPackage}.aar")
+// Cached per release tag, so a new ffmpegKitReleaseTag downloads its own AAR instead of reusing the last one
+def ffmpegKitAar = new File(layout.buildDirectory.get().asFile, "ffmpeg-kit/${ffmpegKitReleaseTag}/ffmpeg-kit-${ffmpegKitPackage}.aar")
 if (!ffmpegKitAar.exists()) {
   ffmpegKitAar.parentFile.mkdirs()
   def ffmpegKitAarUrl = "https://github.com/${ffmpegKitRepo}/releases/download/${ffmpegKitReleaseTag}/ffmpeg-kit-${ffmpegKitPackage}.aar"
