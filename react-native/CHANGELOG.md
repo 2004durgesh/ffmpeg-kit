@@ -1,5 +1,11 @@
 # Changelog
 
+# [7.0.0-beta.6](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.5...v7.0.0-beta.6) (2026-11-14)
+
+### Bug Fixes
+
+* report the version of the ffmpeg binaries in use instead of a hard-coded 6.0.2 ([1b430d5](https://github.com/2004durgesh/ffmpeg-kit/commit/1b430d52d3259d047e49075f54823ff8106b53f5))
+
 # [7.0.0-beta.5](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.4...v7.0.0-beta.5) (2026-11-14)
 
 ### Bug Fixes
