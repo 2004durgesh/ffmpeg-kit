@@ -3,17 +3,35 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
+// Apps built with the iOS 27 SDK must use the UIScene lifecycle; UIKit traps at
+// launch otherwise. React Native is started from SceneDelegate, registered in
+// Info.plist (UIApplicationSceneManifest).
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+    true
+  }
+}
+
+class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   var window: UIWindow?
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
-  func application(
-    _ application: UIApplication,
-    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
-  ) -> Bool {
+  func scene(
+    _ scene: UIScene,
+    willConnectTo session: UISceneSession,
+    options connectionOptions: UIScene.ConnectionOptions
+  ) {
+    guard let windowScene = scene as? UIWindowScene else {
+      return
+    }
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -21,15 +39,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-    window = UIWindow(frame: UIScreen.main.bounds)
+    window = UIWindow(windowScene: windowScene)
 
-    factory.startReactNative(
-      withModuleName: "FFmpegKitExample",
-      in: window,
-      launchOptions: launchOptions
-    )
-
-    return true
+    factory.startReactNative(withModuleName: "FFmpegKitExample", in: window)
   }
 }
 
