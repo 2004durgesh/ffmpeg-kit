@@ -1,19 +1,17 @@
 name: android ffmpeg binaries
 
-# Builds the FFmpegKit Android AAR(s) from source (this repo is the "binary
-# factory") and publishes them as GitHub Release assets. The react-native
-# package consumes them via the ivy repo declared in
-# react-native/android/build.gradle, resolving:
-#   https://github.com/<owner>/ffmpeg-kit/releases/download/<tag>/ffmpeg-kit-<package>.aar
+# Builds the FFmpegKit Android AAR(s) from source with the build in ffmpeg/ and
+# publishes them as GitHub Release assets. The package's android/build.gradle
+# downloads them at configure time from:
+#   https://github.com/<owner>/react-native-ffmpeg-kit/releases/download/<tag>/ffmpeg-kit-<package>.aar
 #
 # Trigger:
 #   - workflow_dispatch: build on demand (uploads a workflow artifact)
 #   - push tag 'ffmpeg-android-*': build + attach the AARs to that release
-#     (the tag is what react-native/android/build.gradle's ffmpegKitReleaseTag
-#     must point at)
+#     (the tag is what android/build.gradle's ffmpegKitReleaseTag must point at)
 #
-# Every .so is linked with -Wl,-z,max-page-size=16384 (scripts/function-android.sh), so the AARs work on Android 15+
-# devices with 16 KB pages; ffmpeg-android-6.0.3 is the first tag built that way.
+# Every .so is linked with -Wl,-z,max-page-size=16384 (ffmpeg/scripts/function-android.sh), so the AARs work on
+# Android 15+ devices with 16 KB pages; ffmpeg-android-6.0.3 is the first tag built that way.
 
 on:
   workflow_dispatch:
@@ -48,6 +46,8 @@ jobs:
     defaults:
       run:
         shell: bash
+        # The build resolves every path from the directory it runs in.
+        working-directory: ffmpeg
     steps:
       - uses: actions/checkout@v4
 
@@ -80,9 +80,10 @@ jobs:
         run: |
           SRC="prebuilt/bundle-android-aar/ffmpeg-kit/ffmpeg-kit.aar"
           test -f "$SRC" || { echo "AAR not found at $SRC"; exit 1; }
-          mkdir -p dist
-          cp "$SRC" "dist/ffmpeg-kit-${{ matrix.package }}.aar"
-          ls -lh dist
+          # dist/ is at the repo root: upload-artifact and the release step ignore working-directory
+          mkdir -p "$GITHUB_WORKSPACE/dist"
+          cp "$SRC" "$GITHUB_WORKSPACE/dist/ffmpeg-kit-${{ matrix.package }}.aar"
+          ls -lh "$GITHUB_WORKSPACE/dist"
 
       - name: print build logs
         if: ${{ always() }}

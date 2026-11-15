@@ -1,0 +1,3 @@
+# Keep line endings as committed (gradlew.bat is stored with CRLF); the package root
+# .gitattributes would otherwise renormalize *.bat here.
+*.bat -text

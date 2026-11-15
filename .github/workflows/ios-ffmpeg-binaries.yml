@@ -1,10 +1,9 @@
 name: ios ffmpeg binaries
 
-# Builds the FFmpegKit iOS xcframework bundle(s) from source (this repo is the
-# "binary factory") and publishes them as GitHub Release assets. The
-# react-native package consumes them from the release by downloading the zip in
-# its podspec (react-native/ffmpeg-kit-react-native.podspec), resolving:
-#   https://github.com/<owner>/ffmpeg-kit/releases/download/<tag>/ffmpeg-kit-ios-<package>.xcframework.zip
+# Builds the FFmpegKit iOS xcframework bundle(s) from source with the build in
+# ffmpeg/ and publishes them as GitHub Release assets. The package's podspec
+# (react-native-ffmpeg-kit.podspec) downloads the zip while it is evaluated:
+#   https://github.com/<owner>/react-native-ffmpeg-kit/releases/download/<tag>/ffmpeg-kit-ios-<package>.xcframework.zip
 #
 # Trigger:
 #   - workflow_dispatch: build on demand (uploads a workflow artifact)
@@ -60,6 +59,8 @@ jobs:
     defaults:
       run:
         shell: bash
+        # The build resolves every path from the directory it runs in.
+        working-directory: ffmpeg
     steps:
       - uses: actions/checkout@v4
 
@@ -106,8 +107,8 @@ jobs:
           ./ios.sh --xcframework ${{ matrix.flags }}
 
       # ios.sh emits every per-library *.xcframework plus the ffmpegkit.xcframework
-      # umbrella under prebuilt/bundle-apple-xcframework-ios (see
-      # scripts/function-apple.sh get_xcframework_directory(), with
+      # umbrella under ffmpeg/prebuilt/bundle-apple-xcframework-ios (see
+      # ffmpeg/scripts/function-apple.sh get_xcframework_directory(), with
       # FFMPEG_KIT_BUILD_TYPE=ios and no --lts). Zip the *contents* of that
       # directory so the *.xcframework bundles sit at the zip root (the podspec
       # unzips them flat and vendors *.xcframework).
@@ -115,9 +116,10 @@ jobs:
         run: |
           OUT_DIR="prebuilt/bundle-apple-xcframework-ios"
           test -d "$OUT_DIR" || { echo "xcframework output dir not found: $OUT_DIR"; ls -la prebuilt || true; exit 1; }
-          mkdir -p dist
+          # dist/ is at the repo root: upload-artifact and the release step ignore working-directory
+          mkdir -p "$GITHUB_WORKSPACE/dist"
           ( cd "$OUT_DIR" && zip -r -y "$GITHUB_WORKSPACE/dist/ffmpeg-kit-ios-${{ matrix.package }}.xcframework.zip" . )
-          ls -lh dist
+          ls -lh "$GITHUB_WORKSPACE/dist"
 
       - name: print build logs
         if: ${{ always() }}

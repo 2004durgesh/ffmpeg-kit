@@ -1,8 +1,10 @@
-/build
-/local.properties
-/.idea/
-/.gradle/
-/libs/
-/obj/
-/ffmpeg-kit-android-lib/build/
-*.tmp
+# Gradle / Android Studio
+.gradle/
+.idea/
+.kotlin/
+build/
+local.properties
+*.iml
+
+# CMake intermediates from externalNativeBuild (the C++ core)
+.cxx/

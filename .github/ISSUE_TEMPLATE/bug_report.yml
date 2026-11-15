@@ -1,0 +1,75 @@
+name: 🐛 Bug report
+description: Report a reproducible bug or regression in react-native-ffmpeg-kit.
+labels: [bug]
+body:
+  - type: checkboxes
+    attributes:
+      label: Before submitting
+      options:
+        - label: I tested with the latest version of react-native-ffmpeg-kit.
+          required: true
+        - label: I searched existing issues for duplicates.
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+      description: What you expected, what happened instead, and any error message or stack trace.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: FFmpeg command
+      description: The command or arguments you ran, and the session's output (`await session.getOutput()`) if it failed.
+      render: shell
+  - type: input
+    id: library-version
+    attributes:
+      label: Library version
+      placeholder: "7.0.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options:
+        - Android
+        - iOS
+    validations:
+      required: true
+  - type: dropdown
+    id: package
+    attributes:
+      label: FFmpeg package
+      description: Set with `ffmpegKitPackage` (Android) or `FFMPEG_KIT_IOS_PACKAGE` (iOS).
+      options:
+        - https (default)
+        - full-gpl
+        - custom build
+    validations:
+      required: true
+  - type: textarea
+    id: react-native-info
+    attributes:
+      label: Environment
+      description: Paste the output of `npx react-native info`.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      value: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: input
+    id: reproducible-example
+    attributes:
+      label: Reproducible example
+      description: A link to a repository that reproduces the problem, if you have one.

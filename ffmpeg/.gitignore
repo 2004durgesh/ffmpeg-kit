@@ -1,0 +1,4 @@
+# FFmpeg binary build outputs (run android.sh / ios.sh from this folder)
+/.tmp/
+/*.log
+/prebuilt/
