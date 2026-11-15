@@ -4,7 +4,7 @@ A **maintained, New-Architecture-only** fork of
 [`ffmpeg-kit-react-native`](https://github.com/arthenica/ffmpeg-kit) (ARTHENICA),
 which was retired upstream. This fork keeps the React Native binding alive:
 
-- **TurboModule** (React Native New Architecture) — no legacy bridge.
+- Built on [Nitro Modules](https://nitro.margelo.com) (New Architecture only).
 - FFmpeg **v6.0**, both `FFmpeg` and `FFprobe`.
 - Android + iOS, with the same JavaScript API as upstream.
 - Native FFmpeg binaries are **rebuilt and hosted by this fork** (upstream
@@ -18,12 +18,14 @@ which was retired upstream. This fork keeps the React Native binding alive:
 - React Native **>= 0.80** with the **New Architecture enabled** (default on
   0.76+). Old-architecture apps are not supported.
 - React **>= 19**.
+- [`react-native-nitro-modules`](https://www.npmjs.com/package/react-native-nitro-modules) **0.37.x**, installed in your app.
 
 ## Installation
 
 ```sh
-yarn add react-native-ffmpeg-kit
-# or: npm install react-native-ffmpeg-kit
+yarn add react-native-ffmpeg-kit react-native-nitro-modules
+# or: npm install react-native-ffmpeg-kit react-native-nitro-modules
+cd ios && pod install
 ```
 
 No extra native setup is required. The Android build automatically downloads
@@ -110,7 +112,8 @@ all of it applies unchanged.
 
 The library's `android/build.gradle` downloads the FFmpeg `.aar` directly from
 this fork's GitHub Releases during the Gradle configuration phase using
-`ant.get`, then wires it in as a local `files()` dependency. This means:
+`ant.get`, unpacks it, and adds its classes and native libraries to the
+library. This means:
 
 - **No ivy/Maven repo declarations** needed in the consuming app.
 - The AAR is cached in the module's Gradle build directory — subsequent builds
@@ -120,13 +123,29 @@ this fork's GitHub Releases during the Gradle configuration phase using
 
 ## What changed vs. upstream
 
-- Converted to a **TurboModule** (codegen spec, typed events); dropped the
-  `NativeEventEmitter`/legacy bridge path.
+- Rebuilt on **Nitro Modules**; dropped the `NativeEventEmitter`/legacy bridge path.
 - Baseline bumped to **RN 0.80 / React 19**.
 - Native binaries are **rebuilt and published by this fork** rather than pulled
   from the retired ARTHENICA hosting.
 - Android AAR is fetched at build time (no custom repo config required by consumers).
 - Published under the name **`react-native-ffmpeg-kit`**.
+
+## Behaviour changes in 7.0
+
+The JavaScript API is unchanged, but you may notice these differences from 6.x
+and the 7.0 betas:
+
+- **FFmpeg logs no longer appear in the Metro console.** When the
+  `LogRedirectionStrategy` says a line should be printed, it goes to the
+  platform log instead: logcat tag `ffmpeg-kit` on Android, subsystem
+  `com.arthenica.ffmpegkit` in the iOS unified log (Xcode console, Console.app).
+  To handle logs in JavaScript, register a log callback.
+- **`MediaInformationJsonParser` works.** `from()` resolves `undefined` for
+  invalid JSON and `fromWithError()` rejects; both threw before.
+- **`MediaInformation.getDuration()` is typed `string`.** It always returned
+  ffprobe's text, for example `"10.000000"`. Use `parseFloat` for a number.
+- **`getAllLogs(waitTimeout)` and similar methods return immediately.** Logs are
+  stored before callbacks run, so there is nothing left to wait for.
 
 ## License
 
