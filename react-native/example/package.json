@@ -6,23 +6,26 @@
     "start": "react-native start",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "pod-install": "cd ios && RCT_NEW_ARCH_ENABLED=1 pod install"
+    "pod-install": "cd ios && pod install"
   },
   "dependencies": {
     "react": "19.2.3",
     "react-native": "0.86.0",
-    "react-native-ffmpeg-kit": "link:.."
+    "react-native-nitro-modules": "0.37.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@babel/preset-env": "^7.25.3",
     "@babel/runtime": "^7.25.0",
+    "@react-native-community/cli": "20.2.0",
+    "@react-native-community/cli-platform-android": "20.2.0",
+    "@react-native-community/cli-platform-ios": "20.2.0",
     "@react-native/babel-preset": "0.86.0",
     "@react-native/metro-config": "0.86.0",
     "@react-native/typescript-config": "0.86.0",
     "@types/react": "^19.2.0",
-    "babel-plugin-module-resolver": "^5.0.2",
-    "typescript": "^5.8.3",
-    "@react-native-community/cli": "latest"
+    "react-native-builder-bob": "^0.44.1",
+    "react-native-monorepo-config": "^0.4.0",
+    "typescript": "^5.8.3"
   }
 }

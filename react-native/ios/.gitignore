@@ -1,0 +1,8 @@
+# FFmpeg xcframeworks, downloaded while the podspec is evaluated
+FFmpegKitFrameworks/
+
+# Xcode
+build/
+DerivedData/
+xcuserdata/
+*.xcuserstate

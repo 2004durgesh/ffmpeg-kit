@@ -1,51 +1,15 @@
-buildscript {
-  repositories {
-    google()
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath "com.android.tools.build:gradle:8.7.2"
-    classpath "com.facebook.react:react-native-gradle-plugin"
-  }
-}
-
-apply plugin: "com.android.library"
-apply plugin: "com.facebook.react"
+ext.NitroFFmpegKit = [
+  minSdkVersion: 24,
+  compileSdkVersion: 36
+]
 
 def safeExtGet(prop, fallback) {
   rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
 }
 
-android {
-  namespace "com.arthenica.ffmpegkit.reactnative"
-
-  compileSdkVersion safeExtGet("compileSdkVersion", 35)
-
-  defaultConfig {
-    minSdkVersion safeExtGet("minSdkVersion", 24)
-    targetSdkVersion safeExtGet("targetSdkVersion", 34)
-  }
-
-  buildFeatures {
-    buildConfig true
-  }
-
-  buildTypes {
-    release {
-      minifyEnabled false
-    }
-  }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
-  }
-}
-
-repositories {
-  google()
-  mavenCentral()
+def reactNativeArchitectures() {
+  def value = rootProject.getProperties().get("reactNativeArchitectures")
+  return value ? value.split(",") : ["armeabi-v7a", "x86_64", "arm64-v8a"]
 }
 
 // FFmpeg native binaries (AAR) are published as GitHub Release assets by the
@@ -60,8 +24,6 @@ repositories {
 def ffmpegKitPackage = safeExtGet('ffmpegKitPackage', 'https')
 def ffmpegKitReleaseTag = safeExtGet('ffmpegKitReleaseTag', 'ffmpeg-android-6.0.3')
 def ffmpegKitRepo = safeExtGet('ffmpegKitRepo', '2004durgesh/ffmpeg-kit')
-// Reported by getBinaryVersion(), so the app can tell which binaries it got
-android.defaultConfig.buildConfigField "String", "FFMPEG_KIT_RELEASE_TAG", "\"${ffmpegKitReleaseTag}\""
 // Cached per release tag, so a new ffmpegKitReleaseTag downloads its own AAR instead of reusing the last one
 def ffmpegKitAar = new File(layout.buildDirectory.get().asFile, "ffmpeg-kit/${ffmpegKitReleaseTag}/ffmpeg-kit-${ffmpegKitPackage}.aar")
 if (!ffmpegKitAar.exists()) {
@@ -70,13 +32,114 @@ if (!ffmpegKitAar.exists()) {
   logger.lifecycle("react-native-ffmpeg-kit: downloading ${ffmpegKitAarUrl}")
   ant.get(src: ffmpegKitAarUrl, dest: ffmpegKitAar)
 }
+// The AAR is unpacked and its parts consumed directly (classes jar, jni libs,
+// resources, consumer ProGuard rules). AGP refuses to bundle a library that
+// depends on a local .aar, which breaks `./gradlew assembleRelease` in apps.
+def ffmpegKitUnpacked = new File(ffmpegKitAar.parentFile, ffmpegKitPackage)
+if (!new File(ffmpegKitUnpacked, "classes.jar").exists()) {
+  ant.unzip(src: ffmpegKitAar, dest: ffmpegKitUnpacked)
+}
+
+apply plugin: "com.android.library"
+
+if (project.extensions.findByName("kotlin") == null) {
+  apply plugin: "kotlin-android"
+}
+
+apply from: '../nitrogen/generated/android/NitroFFmpegKit+autolinking.gradle'
+
+// No "com.facebook.react" plugin: a Nitro module has no RN codegen, and in this
+// repo the plugin's codegen scans example/node_modules and compiles React
+// Native's own specs into the library (duplicate classes in release builds).
+
+android {
+  namespace "com.margelo.nitro.ffmpegkit"
+
+  compileSdkVersion safeExtGet("compileSdkVersion", NitroFFmpegKit.compileSdkVersion)
+
+  defaultConfig {
+    minSdkVersion safeExtGet("minSdkVersion", NitroFFmpegKit.minSdkVersion)
+
+    // Keeps the native methods libffmpegkit's JNI_OnLoad registers.
+    consumerProguardFiles new File(ffmpegKitUnpacked, "proguard.txt")
+
+    externalNativeBuild {
+      cmake {
+        cppFlags "-frtti -fexceptions -Wall -fstack-protector-all"
+        arguments "-DANDROID_STL=c++_shared",
+                  "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
+                  "-DFFMPEG_KIT_RELEASE_TAG=${ffmpegKitReleaseTag}"
+        abiFilters (*reactNativeArchitectures())
+
+        buildTypes {
+          debug {
+            cppFlags "-O1 -g"
+          }
+          release {
+            cppFlags "-O3"
+          }
+        }
+      }
+    }
+  }
+
+  if (rootProject.ext.has("ndkVersion")) {
+    ndkVersion rootProject.ext.ndkVersion
+  }
+
+  externalNativeBuild {
+    cmake {
+      path "CMakeLists.txt"
+    }
+  }
+
+  packaging {
+    resources {
+      excludes += [
+        "META-INF",
+        "META-INF/**"
+      ]
+    }
+
+    jniLibs {
+      excludes += [
+        "**/libc++_shared.so",
+        "**/libfbjni.so",
+        "**/libjsi.so",
+        "**/libfolly_json.so",
+        "**/libfolly_runtime.so",
+        "**/libglog.so",
+        "**/libhermes.so",
+        "**/libreactnative.so"
+      ]
+    }
+  }
+
+  sourceSets {
+    main {
+      // FFmpeg's .so files and its license texts (res/raw), from the unpacked AAR
+      jniLibs.srcDirs += [new File(ffmpegKitUnpacked, "jni")]
+      res.srcDirs += [new File(ffmpegKitUnpacked, "res")]
+    }
+  }
+
+  buildFeatures {
+    prefab true
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
+  }
+}
 
 dependencies {
   implementation "com.facebook.react:react-android"
-  implementation files(ffmpegKitAar)
+  implementation project(":react-native-nitro-modules")
+  implementation files(new File(ffmpegKitUnpacked, "classes.jar"))
 
-  // ffmpeg-kit's own runtime dependency. The AAR is consumed as a local file()
-  // dependency (above), which carries no transitive deps, so declare it here or
-  // FFmpegKitConfig.<clinit> throws NoClassDefFoundError for smartexception.
+  // ffmpeg-kit's own runtime dependency. Its classes are consumed as a local
+  // file() dependency (above), which carries no transitive deps, so declare it
+  // here or FFmpegKitConfig.<clinit> throws NoClassDefFoundError for smartexception.
   implementation "com.arthenica:smart-exception-java:0.2.1"
 }
