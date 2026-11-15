@@ -1,5 +1,17 @@
 # Changelog
 
+# [7.0.0-beta.7](https://github.com/2004durgesh/react-native-ffmpeg-kit/compare/v7.0.0-beta.6...v7.0.0-beta.7) (2026-11-15)
+
+* feat(react-native)!: rewrite on Nitro Modules with a shared C++ core ([43099bb](https://github.com/2004durgesh/react-native-ffmpeg-kit/commit/43099bbfbff1987ec4acd2e3fedfaef8dbf4b5b3))
+
+### BREAKING CHANGES
+
+* apps must also install react-native-nitro-modules. FFmpeg
+  log lines printed because of the LogRedirectionStrategy go to logcat or the
+  iOS unified log instead of the Metro console.
+  MediaInformation.getDuration() is typed as string, which is what it always
+  returned.
+
 # [7.0.0-beta.6](https://github.com/2004durgesh/ffmpeg-kit/compare/v7.0.0-beta.5...v7.0.0-beta.6) (2026-11-14)
 
 ### Bug Fixes

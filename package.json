@@ -1,6 +1,6 @@
 {
   "name": "react-native-ffmpeg-kit",
-  "version": "7.0.0-beta.6",
+  "version": "7.0.0-beta.7",
   "description": "FFmpeg Kit for React Native (Nitro Modules)",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
